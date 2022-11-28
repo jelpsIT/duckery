@@ -1,3 +1,4 @@
+function download {
 New-Item -ItemType Directory -Force -Path C:\Temp
 $wc = New-Object System.Net.WebClient
 $wc.DownloadFile($url, $outpath)
@@ -5,7 +6,7 @@ $wc.DownloadFile($url, $outpath)
 $url = 'https://i.ebayimg.com/images/g/1SEAAOSwKcRhL~15/s-l1600.jpg'
 $outpath = "C:\Temp\s-l1600.jpg"
 Invoke-WebRequest -Uri $url -OutFile $outpath
-
+}
 
 
 function Set-Wallpaper {
