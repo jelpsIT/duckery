@@ -19,17 +19,10 @@ param (
 )
  
 $WallpaperStyle = Switch ($Style) {
-  
-    "Fill" {"10"}
-    "Fit" {"6"}
-    "Stretch" {"2"}
     "Tile" {"0"}
-    "Center" {"0"}
-    "Span" {"22"}
-  
 }
  
-If($Style -eq "Tile") {
+If($Style) {
  
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 -Force
