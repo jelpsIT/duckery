@@ -18,17 +18,8 @@ param (
     [string]$Style
 )
  
-$WallpaperStyle = Switch ($Style) {
-    "Tile" {"0"}
-}
- 
-If($Style) {
- 
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 -Force
- 
-}
-Else {
  
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String -Value $WallpaperStyle -Force
     New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 0 -Force
@@ -58,4 +49,4 @@ public class Params
     $ret = [Params]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $Image, $fWinIni)
 }
  
-Set-WallPaper -Image "C:\Temp\s-l1600.jpg" -Style Tile
+Set-WallPaper -Image "C:\Temp\s-l1600.jpg"
