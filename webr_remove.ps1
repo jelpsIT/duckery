@@ -43,18 +43,15 @@ $RegStartupPaths = @(
 
 # Webroot SecureAnywhere folders
 $Folders = @(
-    "%ProgramData%\WRData",
-    "%ProgramData%\WRCore",
-    "%ProgramFiles%\Webroot",
-    "%ProgramFiles(x86)%\Webroot",
-    "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Webroot SecureAnywhere"
+    "C:\ProgramData\WRData",
+    "C:\ProgramData\WRCore",
+    "C:\ProgramFiles\Webroot",
+    "C:\ProgramFiles(x86)\Webroot",
+    "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Webroot SecureAnywhere"
 )
 
-# Try to Uninstall - https://community.webroot.com/webroot-secureanywhere-antivirus-12/pc-uninstallation-option-missing-from-control-panel-34688
-Start-Process -FilePath "${Env:ProgramFiles(x86)}\Webroot\WRSA.exe" -ArgumentList "-uninstall" -Wait -ErrorAction SilentlyContinue
-Start-Process -FilePath "${Env:ProgramFiles}\Webroot\WRSA.exe" -ArgumentList "-uninstall" -Wait -ErrorAction SilentlyContinue
-
 # Stop & Delete Webroot SecureAnywhere service
+taskkill /im wrsa.exe /f
 sc.exe stop WRSVC
 sc.exe stop WRCoreService
 sc.exe stop WRSkyClient
@@ -68,7 +65,7 @@ Stop-Process -Name "WRSA" -Force
 # Remove Webroot SecureAnywhere registry keys
 ForEach ($RegKey in $RegKeys) {
     Write-Host "Removing $RegKey"
-    Remove-Item -Path $RegKey -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path $RegKey -Recurse -ErrorAction SilentlyContinue
 }
 
 # Remove Webroot SecureAnywhere registry startup items
@@ -80,7 +77,7 @@ ForEach ($RegStartupPath in $RegStartupPaths) {
 # Remove Webroot SecureAnywhere folders
 ForEach ($Folder in $Folders) {
     Write-Host "Removing $Folder"
-    Remove-Item -Path "$Folder" -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path "$Folder" -Recurse 
 }
 
 Write-Host A212-WRSM-AEDA-C43C-4681
@@ -94,3 +91,22 @@ $application = Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq “
 $application2 = Get-WmiObject -Class Win32_Product | Where-Object{$_.Name -eq “Webroot SecureAnywhere”}
 $application.Uninstall()
 $application2.Uninstall()
+
+Remove-Item -Path "C:\Program Files\Webroot" -Recurse
+Remove-Item -Path "C:\ProgramData\WRData" -Recurse
+Remove-Item -Path "C:\ProgramData\WRCore" -Recurse
+Remove-Item -Path "C:\Users\All Users\Webroot" -Recurse
+
+# Delete the Webroot registry keys
+reg delete HKLM\SOFTWARE\WOW6432Node\webroot /f
+reg delete HKLM\SOFTWARE\WOW6432Node\WRData /f
+reg delete HKLM\SOFTWARE\WOW6432Node\WRData /f
+
+# Delete any remaining Webroot files
+Remove-Item -Path "C:\*Webroot*" -Recurse
+Remove-Item -Path "C:\Users\*\AppData\Local\Webroot" -Recurse
+Remove-Item -Path "C:\Users\*\AppData\Roaming\Webroot" -Recurse
+
+# Try to Uninstall - https://community.webroot.com/webroot-secureanywhere-antivirus-12/pc-uninstallation-option-missing-from-control-panel-34688
+Start-Process -FilePath "${Env:ProgramFiles(x86)}\Webroot\WRSA.exe" -ArgumentList "-uninstall" -Wait -ErrorAction SilentlyContinue
+Start-Process -FilePath "${Env:ProgramFiles}\Webroot\WRSA.exe" -ArgumentList "-uninstall" -Wait -ErrorAction SilentlyContinue
