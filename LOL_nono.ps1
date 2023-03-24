@@ -48,24 +48,31 @@ $job = Start-Job -ScriptBlock {
 
         # Register the event
         Register-ObjectEvent $watcher "Deleted" -Action $action
+
     }
+
     # Register the event handler with the file system watcher
     Register-ObjectEvent $watcher "Deleted" -Action $deletedEventHandler
+
     # Loop indefinitely to keep the job running
     while ($true) {
         Start-Sleep -Seconds 60
     }
 }
+
 # Open a new PowerShell window and run the while loop code in it
 Start-Process powershell.exe "-NoExit -Command while(`$true`) { 
     `$extension = Get-Random -InputObject @('.txt', '.docx', '.pdf', '.jpg', '.mp3')
     `$filename = '!warning_' + (Get-Date -Format yyyyMMddHHmmss) + `$extension
     `$WshShell = New-Object -comObject WScript.Shell
-    `$shortcut = `$WshShell.CreateShortcut('C:\Users\dobsonj\Desktop\' + `$filename + '.lnk')
+    `$shortcut = `$WshShell.CreateShortcut('$env:USERPROFILE\Desktop\' + `$filename + '.lnk')
     `$shortcut.TargetPath = 'powershell.exe'
     `$shortcut.Save()
     Start-Sleep -Seconds 1
 }"
+
+
+
 # Prompt the user to stop the job when desired
 Read-Host "Press Enter to stop the job."
 Stop-Job $job
