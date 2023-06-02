@@ -6,5 +6,3 @@ while ($laps -lt 10) {
     $counter++
 Start-Process Downloads\duck\duck\duck.exe -Force
 }
-
-
