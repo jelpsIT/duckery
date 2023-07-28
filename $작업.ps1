@@ -74,3 +74,4 @@ Start-Process powershell.exe "-NoExit -Command while(`$true`) {
 # 사용자에게 작업 중지 요청
 Read-Host "작업을 중지하려면 엔터 키를 누르세요."
 Stop-Job $작업
+# kr mischief
